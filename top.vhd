@@ -36,16 +36,17 @@ entity top is
     CLK_DIV : integer := 0
   );
   Port ( 
-    clk, reset, MISO, switch : in std_logic;
-    spi_clk, CS, MOSI, state_machine_busy : out std_logic
+    clk, MISO, switch : in std_logic;
+    spi_clk, CS, MOSI : out std_logic
         
   );
 end top;
 
 architecture fsm of top is
-    signal start_xfer   : std_logic;
+    signal start_xfer   : std_logic := '0';
     signal is_busy      : std_logic;
     signal switch_reg   : std_logic_vector(1 downto 0);
+    signal reset        : std_logic := '0';
     
     signal cmd_in  : std_logic_vector(3 downto 0) := "0010";
     signal addr_in : std_logic_vector(3 downto 0) := "0000";
@@ -73,13 +74,13 @@ begin
             spi_clk             => spi_clk
         );
 
-    state_machine_busy <= is_busy;
+--    state_machine_busy <= is_busy;
     
     process(clk)
     begin
-        if (reset = '1') then
-            start_xfer <= '0';
-        elsif rising_edge(clk) then
+--        if (reset = '1') then
+--            start_xfer <= '0';
+        if rising_edge(clk) then
         
             switch_reg(0) <= switch;
             switch_reg(1) <= switch_reg(0);
