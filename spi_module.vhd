@@ -55,6 +55,7 @@ architecture fsm of spi_module is
     signal idx_cnt        : integer := 0;
     signal cycle_cnt      : integer := 0;
     signal spi_clk_int    : std_logic := '0';
+    signal first_time     : std_logic := '1';
 --    signal spi_clk_reg    : std_logic_vector(1 downto 0);
 begin
 
@@ -99,14 +100,20 @@ begin
                         state               <= BUSY;
                         state_machine_busy  <= '1'; -- set busy flag
                         CS                  <= '0'; -- pull chip select low to initiate transfer
-                        msg                 <= cmd & addr & data;
                         bit_index           <= 22;
                         idx_cnt             <= 0;
                         cycle_cnt           <= 0;
-                        MOSI <= msg(23);
+                        msg <= cmd & addr & data;
+                        first_time         <= '1';
+--                        MOSI <= msg(23);
                     end if;
                 
                 when BUSY =>
+                
+                    if (first_time = '1') then
+                        mosi <= msg(23);
+                        first_time <= '0';
+                    end if;
                 
                     if (cycle_cnt = 1) then
                         cycle_cnt <= 0;
